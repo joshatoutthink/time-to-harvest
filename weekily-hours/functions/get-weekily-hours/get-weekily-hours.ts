@@ -9,7 +9,7 @@ console.log("WEEKILY HOURS");
 const USER_ID = process.env.USER_ID;
 const TOKEN = process.env.HARVEST_TOKEN;
 const ACCOUNT_ID = process.env.ACCOUNT_ID;
-
+const SLACK_URL = process.env.SLACK_URL;
 const BASE_API = "https://api.harvestapp.com";
 const oneWeek = 1000 * 60 * 60 * 24 * 7;
 
@@ -32,7 +32,7 @@ const handler: Handler = async function app() {
   });
   const body = JSON.stringify({ text: "hello", ...message });
   await fetch(
-    "https://hooks.slack.com/services/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",
+    SLACK_URL,
     {
       "Content-type": "application/json",
       method: "POST",
