@@ -1,0 +1,15 @@
+{
+  "name": "weekily-hours",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^16.9.6"
+  },
+  "dependencies": {
+    "@netlify/functions": "^0.7.2",
+    "canvas": "^2.8.0",
+    "dotenv": "^10.0.0",
+    "node-fetch": "^3.0.0"
+  }
+}
