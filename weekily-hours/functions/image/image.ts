@@ -1,6 +1,7 @@
 import { Handler } from "@netlify/functions";
 import { createCanvas } from "canvas";
 
+console.log("hey");
 const handler: Handler = async (event, context) => {
   const canvas = createCanvas(200, 200);
   const ctx = canvas.getContext("2d");
