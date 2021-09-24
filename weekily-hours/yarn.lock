@@ -294,6 +294,15 @@ nan@^2.14.0:
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.15.0.tgz#3f34a473ff18e15c1b5626b62903b5ad6e665fee"
   integrity sha512-8ZtvEnA2c5aYCZYd1cvgdnU6cqwixRoYg70xPLWUws5ORTa/lnw+u4amixRS/Ac5U5mQVgp9pnlSUnbNWFaWZQ==
 
+node-canvas@^2.7.0:
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/node-canvas/-/node-canvas-2.7.0.tgz#771f3bd508f875c9e63171856d95e2be19ff86fd"
+  integrity sha512-G8Fq/ZWT13/dcvhrgDzi5Kus9u8sUR/VwxIeFqUytkuZlW9WR3lA6iB8TTOU8piGU+W/C6U/R9f8bqVoiN49mg==
+  dependencies:
+    "@mapbox/node-pre-gyp" "^1.0.0"
+    nan "^2.14.0"
+    simple-get "^3.0.3"
+
 node-fetch@^2.6.1:
   version "2.6.5"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.5.tgz#42735537d7f080a7e5f78b6c549b7146be1742fd"
