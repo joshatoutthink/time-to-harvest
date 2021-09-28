@@ -25,10 +25,15 @@ const handler: Handler = async function app() {
   const usersTimeSheet = await getTimeEntries(USER_ID);
   const userName = usersTimeSheet[0].user.name;
   const hours = userPastWeekHours(usersTimeSheet);
+  const data = Object.keys(hours.hoursByProject).map((key) => ({
+    label: key,
+    hours: hours.hoursByProject[key].hours,
+  }));
+
   const message = template({
     title: "My Week",
     text: `Some of what ${userName} did this past week`,
-    data: hours,
+    data,
   });
   const body = JSON.stringify({ text: "hello", ...message });
   await fetch(
@@ -112,7 +117,7 @@ function format(
   args: {
     title: string;
     text: string;
-    data: Record<string, any>;
+    data: { label: string; hours: number }[];
   },
   debug = false,
 ) {
@@ -122,10 +127,17 @@ function format(
     console.log("TODO send to slack");
   }
 }
+
+function setEntries(entries: { label: string; hours: number }[]) {
+  return entries.reduce((params, entry: { label: string; hours: number }) => {
+    return `${params}${entry.label}:${entry.hours},`;
+  }, "");
+}
+
 function template({ title, text, data }: {
   title: string;
   text: string;
-  data: Record<string, any>;
+  data: { label: string; hours: number }[];
 }) {
   return {
     blocks: [
@@ -137,7 +149,9 @@ function template({ title, text, data }: {
           emoji: true,
         },
         image_url:
-          "https://outthink-harvest-bot.netlify.app/.netlify/functions/image",
+          `https://outthink-harvest-bot.netlify.app/.netlify/functions/image?entries=${
+            setEntries(data)
+          }`,
         alt_text: text,
       },
     ],
