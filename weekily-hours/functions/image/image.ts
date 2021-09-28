@@ -5,12 +5,13 @@ console.log("hey");
 const handler: Handler = async (event: HandlerEvent) => {
   const { queryStringParameters } = event;
 
-  const entries = queryStringParameters.entries.split(",").map(
-    (entry: string) => {
-      const [label, hours] = entry.split(":");
-      return ({ label, hours: parseInt(hours) });
-    },
-  );
+  const entries = decodeURIComponent(queryStringParameters.entries).split(",")
+    .map(
+      (entry: string) => {
+        const [label, hours] = entry.split(":");
+        return ({ label, hours: parseInt(hours) });
+      },
+    );
   const canvas = createCanvas(200, 200);
   const rectWidth = 200 / entries.length;
   const biggestRect = entries.reduce(
@@ -18,15 +19,19 @@ const handler: Handler = async (event: HandlerEvent) => {
       m: { label: string; hours: number },
       c: { label: string; hours: number },
     ) => m.hours >= c.hours ? m : c,
-    0,
+    { hours: 0, label: "first" },
   ).hours;
 
   const ctx = canvas.getContext("2d");
 
   const getColor = colorGenerator();
+  console.log(entries);
   entries.map((entry: { label: string; hours: number }, i: number) => {
     const x = rectWidth * i;
-    const rectHeight = getHeight(entry.hours, biggestRect);
+    const rectHeight = getHeight(
+      isNaN(entry.hours) ? 0 : entry.hours,
+      biggestRect,
+    );
     const y = 200 - rectHeight;
 
     const color = getColor();
@@ -38,7 +43,7 @@ const handler: Handler = async (event: HandlerEvent) => {
       height: rectHeight,
       color,
     };
-  }).forEach(
+  }).filter((entry) => Boolean(entry.label)).forEach(
     (
       rect: {
         label: string;

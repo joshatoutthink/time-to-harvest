@@ -3,3 +3,4 @@
 
 [ build ]
 	command="yarn add --force canvas && cp ./libx86/* node_modules/canvas/build/Release/"
+

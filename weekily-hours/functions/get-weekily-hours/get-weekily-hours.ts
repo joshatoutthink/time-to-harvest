@@ -150,7 +150,7 @@ function template({ title, text, data }: {
         },
         image_url:
           `https://outthink-harvest-bot.netlify.app/.netlify/functions/image?entries=${
-            setEntries(data)
+            encodeURIComponent(setEntries(data))
           }`,
         alt_text: text,
       },
