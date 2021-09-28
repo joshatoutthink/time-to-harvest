@@ -36,7 +36,7 @@ const handler: Handler = async function app() {
     data,
   });
   const body = JSON.stringify({ text: "hello", ...message });
-  await fetch(
+  const slack = await fetch(
     SLACK_URL,
     {
       "Content-type": "application/json",
@@ -44,11 +44,14 @@ const handler: Handler = async function app() {
       body,
     },
   ).then((res: Record<string, any>) => res.text()).catch(console.error);
+  console.log(slack);
+
   return {
     statusCode: 200,
     body,
   };
 };
+
 export { handler };
 
 function userPastWeekHours(timeEntries: TimeEntry[]) {
