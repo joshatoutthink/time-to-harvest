@@ -2,4 +2,3 @@
 	node_bundler="esbuild"
 
 [ build ]
-	command = "npm rebuild && cp ./libx86/* node_modules/canvas/build/Release/"
