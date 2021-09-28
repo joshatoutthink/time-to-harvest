@@ -129,9 +129,14 @@ function format(
 }
 
 function setEntries(entries: { label: string; hours: number }[]) {
-  return entries.reduce((params, entry: { label: string; hours: number }) => {
-    return `${params}${entry.label}:${entry.hours},`;
-  }, "");
+  return entries.reduce(
+    (params, entry: { label: string; hours: number }, index: number) => {
+      return `${params}${entry.label}:${entry.hours}${
+        index !== entries.length - 1 ? "," : ""
+      }`;
+    },
+    "",
+  );
 }
 
 function template({ title, text, data }: {
