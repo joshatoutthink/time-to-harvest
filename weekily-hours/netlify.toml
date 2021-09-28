@@ -2,3 +2,4 @@
 	node_bundler="esbuild"
 
 [ build ]
+	command="yarn rebuild"
