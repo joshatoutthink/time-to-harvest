@@ -15,6 +15,7 @@ const LEGEND_HEIGHT = CANVAS_HEIGHT;
 const LEGEND_COLOR_SIZE = 10;
 
 const LINE_HEIGHT = 20;
+const STROKE_WIDTH = 40;
 
 const handler: Handler = async (event: HandlerEvent) => {
   const { queryStringParameters } = event;
@@ -27,13 +28,13 @@ const handler: Handler = async (event: HandlerEvent) => {
       },
     );
 
-  const biggestRect = entries.reduce(
+  const totalHours = entries.reduce(
     (
-      m: { label: string; hours: number },
+      m: number,
       c: { label: string; hours: number },
-    ) => m.hours >= c.hours ? m : c,
-    { hours: 0, label: "first" },
-  ).hours;
+    ) => m + c.hours,
+    0,
+  );
 
   //set up the canvas
   const canvas = createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -60,49 +61,53 @@ const handler: Handler = async (event: HandlerEvent) => {
 
   const getColor = colorGenerator();
 
+  let startingAngle = 0; // some State to keep track of where we last left of in the pie chart
+  let endingAngle = 0;
   entries.filter((entry) => Boolean(entry.label)).sort((a, b) =>
     a.hours > b.hours ? -1 : 1
   )
     .filter((e, i) => i < MAX_ENTRIES) // just gets the first five TODO use slice
     .map((entry: { label: string; hours: number }, i: number) => {
-      const x = rectWidth * i;
-      const rectHeight = getHeight(
-        isNaN(entry.hours) ? 0 : entry.hours,
-        biggestRect,
-      );
-      const y = GRAPH_HEIGHT - rectHeight;
-
       const color = getColor();
       return {
-        x,
-        y,
         label: entry.label,
         hours: entry.hours,
-        height: rectHeight,
         color,
       };
     }).forEach(
       (
-        rect: {
+        entry: {
           label: string;
           hours: number;
           color: string;
-          x: number;
-          y: number;
-          height: number;
         },
         i,
       ) => {
         //Draw your image.
 
         //graph
-        ctx.fillStyle = rect.color;
-        ctx.fillRect(
-          PADDING + rect.x,
-          PADDING + rect.y,
-          rectWidth,
-          rect.height,
+        const radius = (GRAPH_HEIGHT - PADDING - STROKE_WIDTH) / 2;
+        const center = [
+          GRAPH_WIDTH / 2,
+          GRAPH_HEIGHT / 2,
+        ];
+        startingAngle = endingAngle;
+        endingAngle = endingAngle +
+          ((Math.PI * 2) * (entry.hours / totalHours));
+
+        ctx.fillStyle = entry.color;
+        ctx.strokeStyle = entry.color;
+        ctx.beginPath();
+        ctx.lineWidth = STROKE_WIDTH;
+        ctx.arc(
+          center[0],
+          center[1],
+          radius,
+          startingAngle,
+          endingAngle,
+          false,
         );
+        ctx.stroke();
 
         //legend
         ctx.fillRect(
@@ -116,7 +121,7 @@ const handler: Handler = async (event: HandlerEvent) => {
         ctx.font = "12px sans-serif";
         ctx.fillStyle = "white";
         ctx.fillText(
-          rect.label,
+          entry.label,
           (CANVAS_WIDTH - LEGEND_WIDTH) + PADDING + (LEGEND_COLOR_SIZE * 2), // double color block size for extra spacing
           PADDING + 9 + i * LINE_HEIGHT, //the 9 helps center the text with the color block
         );
@@ -133,20 +138,13 @@ const handler: Handler = async (event: HandlerEvent) => {
 };
 export { handler };
 
-function getHeight(rect: number, max: number) {
-  const maxRatio = GRAPH_HEIGHT * max;
-  const ratio = GRAPH_HEIGHT * rect;
-  return (ratio / maxRatio) * GRAPH_HEIGHT;
-}
-
 function colorGenerator() {
-  const cache = new Map();
+  let hue = Math.floor(Math.random() * 360);
+  const increment = 360 / MAX_ENTRIES;
   const getHue = (): number => {
-    const attempt = Math.floor((Math.random() * 360));
-    if (cache.has(attempt)) {
-      return getHue();
-    }
-    return attempt;
+    const currentHue = hue;
+    hue = hue + increment;
+    return currentHue;
   };
   return function getColor() {
     const hue = getHue();
