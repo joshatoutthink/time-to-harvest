@@ -31,7 +31,6 @@ const handler: Handler = async function app() {
     data,
   });
   const body = JSON.stringify({
-    text: "A look into this past week",
     ...message,
   });
   const slack = await fetch(
