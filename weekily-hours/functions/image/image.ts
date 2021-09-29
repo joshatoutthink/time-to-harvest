@@ -1,5 +1,7 @@
 import { Handler, HandlerEvent } from "@netlify/functions";
-import { createCanvas } from "canvas";
+import { createCanvas, registerFont } from "canvas";
+
+registerFont("./functions/image/Roboto-Bold.ttf", { family: "Roboto Bold" });
 
 const CANVAS_WIDTH = 420;
 const CANVAS_HEIGHT = 236;
@@ -118,7 +120,7 @@ const handler: Handler = async (event: HandlerEvent) => {
         ); // color block uses the same fillStyle
 
         // label
-        ctx.font = "12px sans-serif";
+        ctx.font = "12px 'Roboto Bold'";
         ctx.fillStyle = "white";
         ctx.fillText(
           entry.label,
