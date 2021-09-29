@@ -33,17 +33,11 @@ const handler: Handler = async function app() {
   const body = JSON.stringify({
     ...message,
   });
-  const slack = await fetch(
-    SLACK_URL,
-    {
-      "Content-type": "application/json",
-      method: "POST",
-      body,
-    },
-  ).then((res: Record<string, any>) => res.text()).catch(console.error);
-  console.log(slack);
 
   return {
+    headers: {
+      "Content-Type": "application/json",
+    },
     statusCode: 200,
     body,
   };
