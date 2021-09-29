@@ -1,7 +1,7 @@
 import { Handler, HandlerEvent } from "@netlify/functions";
 import { createCanvas, registerFont } from "canvas";
 
-registerFont("./functions/image/Roboto-Bold.ttf", { family: "Roboto Bold" });
+registerFont("./Roboto-Bold.ttf", { family: "Roboto Bold" });
 
 const CANVAS_WIDTH = 420;
 const CANVAS_HEIGHT = 236;
