@@ -1,7 +1,7 @@
 import { Handler, HandlerEvent } from "@netlify/functions";
 import { createCanvas, registerFont } from "canvas";
 import fs from "fs";
-const path = procees.env.IMAGE_PATH;
+const path = process.env.IMAGE_PATH;
 registerFont(`${path}/Roboto-Bold.ttf`, { family: "Roboto Bold" });
 
 const CANVAS_WIDTH = 420;
