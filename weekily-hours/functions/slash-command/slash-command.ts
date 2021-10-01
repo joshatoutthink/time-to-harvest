@@ -13,9 +13,28 @@ const BASE_API = "https://api.harvestapp.com";
 const oneWeek = 1000 * 60 * 60 * 24 * 7;
 
 const handler: Handler = async function app(event: HandlerEvent) {
-  console.log(event.body);
-  if (!USER_ID) return;
-  const usersTimeSheet = await getTimeEntries(USER_ID);
+  const slackUserName = parseBody(event.body).user_name;
+
+  if (!slackUserName) {
+    return {
+      statusCode: 409,
+      body: "error",
+    };
+  }
+  const harvestId = await findHarvestId(slackUserName);
+  if (!harvestId) {
+    return {
+      statusCode: 500,
+      body: "ok",
+    };
+  }
+  const usersTimeSheet = await getTimeEntries(harvestId);
+  if (!usersTimeSheet.length) {
+    return {
+      statusCode: 404,
+      body: "ok",
+    };
+  }
   const userName = usersTimeSheet[0].user.name;
   const hours = userPastWeekHours(usersTimeSheet);
   const data = Object.keys(hours.hoursByProject).map((key) => ({
@@ -76,7 +95,7 @@ async function getTimeEntries(userid: string) {
         ["User-Agent"]: `TimeToHarvest(josh@outthinkgroup.com)`,
       },
     },
-  ).then((res) => res.json());
+  ).then((res: any) => res.json());
   const timeEntries = data.time_entries;
   return timeEntries;
 }
@@ -182,42 +201,38 @@ ${
 		`;
 }
 
-function test() {
-  return {
-    text: "Danny Torrence left a 1 star review for your property.",
-    blocks: [
-      {
-        type: "section",
-        text: {
-          type: "mrkdwn",
-          text: "Danny Torrence left the following review for your property:",
-        },
+function parseBody(body: string | undefined) {
+  if (!body) {
+    return null;
+  }
+
+  return body.split("&").reduce((obj, q) => {
+    const [key, value] = q.split("=");
+    obj[key] = value;
+    return obj;
+  }, {} as any);
+}
+async function findHarvestId(name: string) {
+  //fetch harvest userNames and ids
+  const { users }: { users: Record<string, string>[] } = await fetch(
+    `${BASE_API}/v2/users`,
+    {
+      headers: {
+        Authorization: `Bearer ${TOKEN}`,
+        ["Harvest-Account-Id"]: `${ACCOUNT_ID}`,
+        ["User-Agent"]: `TimeToHarvest(josh@outthinkgroup.com)`,
       },
-      {
-        type: "section",
-        block_id: "section567",
-        text: {
-          type: "mrkdwn",
-          text:
-            "<https://example.com|Overlook Hotel> \n :star: \n Doors had too many axe holes, guest in room 237 was far too rowdy, whole place felt stuck in the 1920s.",
-        },
-        accessory: {
-          type: "image",
-          image_url:
-            "https://is5-ssl.mzstatic.com/image/thumb/Purple3/v4/d3/72/5c/d3725c8f-c642-5d69-1904-aa36e4297885/source/256x256bb.jpg",
-          alt_text: "Haunted hotel image",
-        },
-      },
-      {
-        type: "section",
-        block_id: "section789",
-        fields: [
-          {
-            type: "mrkdwn",
-            text: "*Average Rating*\n1.0",
-          },
-        ],
-      },
-    ],
-  };
+    },
+  ).then((res: any) => res.json());
+
+  const user = users.find((user: Record<string, string>) =>
+    user.first_name.toLowerCase() == name.toLowerCase() ||
+    user.first_name.toLowerCase().includes(name.toLowerCase())
+  );
+  console.log(user);
+  if (user) {
+    return user.id;
+  } else {
+    return null;
+  }
 }
