@@ -1,6 +1,6 @@
 import { config } from "dotenv";
 import fetch from "node-fetch";
-import { Handler } from "@netlify/functions";
+import { Handler, HandlerEvent } from "@netlify/functions";
 import { TimeEntry } from "./types.ts";
 
 config();
@@ -9,11 +9,11 @@ console.log("WEEKILY HOURS");
 const USER_ID = process.env.USER_ID;
 const TOKEN = process.env.HARVEST_TOKEN;
 const ACCOUNT_ID = process.env.ACCOUNT_ID;
-const SLACK_URL = process.env.SLACK_URL;
 const BASE_API = "https://api.harvestapp.com";
 const oneWeek = 1000 * 60 * 60 * 24 * 7;
 
-const handler: Handler = async function app() {
+const handler: Handler = async function app(event: HandlerEvent) {
+  console.log(event.body);
   if (!USER_ID) return;
   const usersTimeSheet = await getTimeEntries(USER_ID);
   const userName = usersTimeSheet[0].user.name;
